@@ -38,51 +38,44 @@ class Dice:
         self.V4 = V4
         
         
-#Printing coordinates of center points of dice using for loops#     
-d1 = []  
-print("Die Centers:")  
+#Printing coordinates of center points of dice using for loops# 
+d1 = []       
 for i in range(0,len(dieCenterX)):
     for j in range(0,len(dieCenterY)):
         dieCenter = np.array(([dieCenterX[i], dieCenterY[j]]))
+        
+        v1X = dieCenterX[i]+(dieSizeX/2)
+        v1Y = dieCenterY[j]+(dieSizeY/2)
+        v1 = np.array(([v1X, v1Y]))
+        
+        v2X = dieCenterX[i]-(dieSizeX/2)
+        v2Y = dieCenterY[j]+(dieSizeY/2)
+        v2 = np.array(([v2X, v2Y]))
+        
+        v3X = dieCenterX[i]-(dieSizeX/2)
+        v3Y = dieCenterY[j]-(dieSizeY/2)
+        v3 = np.array(([v3X, v3Y]))
+        
+        v4X = dieCenterX[i]+(dieSizeX/2)
+        v4Y = dieCenterY[j]-(dieSizeY/2)
+        v4 = np.array(([v4X, v4Y]))
+        
+        print("Die Center:")
         print(dieCenter)
-        
-print("\n" + "V1s: ")       
-for k in range(0,len(dieCenterX)):
-    for l in range(0,len(dieCenterY)):        
-        v1X = dieCenterX+(dieSizeX/2)
-        v1Y = dieCenterY+(dieSizeY/2)
-        v1 = np.array(([v1X[k], v1Y[l]]))
+        print("V1: ")
         print(v1)
-        
-print("\n" + "V2s: ")       
-for m in range(0,len(dieCenterX)):
-    for n in range(0,len(dieCenterY)):        
-        v2X = -v1X
-        v2Y = v1Y
-        v2 = np.array(([v2X[m], v2Y[n]]))
+        print("v2:")
         print(v2)
-        
-print("\n" + "V3s: ")       
-for o in range(0,len(dieCenterX)):
-    for p in range(0,len(dieCenterY)):        
-        v3X = -v1X
-        v3Y = -v1Y
-        v3 = np.array(([v3X[o], v3Y[p]]))
+        print("v3:")
         print(v3)
-        
-print("\n" + "V4s: ")       
-for q in range(0,len(dieCenterX)):
-    for r in range(0,len(dieCenterY)): 
-        v4X = v1X
-        v4Y = -v1Y
-        v4 = np.array(([v4X[q], v4Y[r]]))
+        print("V4:")
         print(v4)
         
-        # if V1,V2,V3,V4 are within the wafer radius then append
-        #d1.append(Dice(dieCenter, v1, v2, v3, v4))
         
-    
-            
+        print("\n")
+        
+        # if V1,V2,V3,V4 are within the wafer radius then append
+        #d1.append(Dice(dieCenter, v1, v2, v3, v4))     
         
 """       
 ###### Generating the Plot ######
