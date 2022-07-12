@@ -83,12 +83,28 @@ for i in range(0,len(dieCenterX)):
         print("\n")
                
 ###### Generating the Plot ######
-x = np.arange(-diameter, diameter, dieSizeX/2)
-y = np.arange(-diameter, diameter, dieSizeY/2)
+"""x = np.arange(-diameter/2, diameter/2, 0.05) 
+y = np.arange(-diameter/2, diameter/2, 0.05)
+X, Y = np.meshgrid(x, y)"""
+ 
+x = np.zeros(len(d1))
+y = np.zeros(len(d1))
+
+for i in range (0, len(d1)):
+    x[i] = d1[i].center[0]
+    y[i] = d1[i].center[1]
+    
+x = np.array(([-0.5,-0.5,0.5,0.5]))
+y = np.array(([-0.5,0.5,-0.5,0.5]))
 X, Y = np.meshgrid(x, y)
-extent = np.min(x), np.max(x), np.min(y), np.max(y)
+extent = np.min(x)-dieSizeX/2, np.max(x)+dieSizeX/2, np.min(y)-dieSizeY/2, np.max(y)+dieSizeY/2 
 fig = plt.figure(frameon=False)
-Z = np.array(([0,0.5],[0.3,0.1])) #Colors
-im1 = plt.imshow(Z, cmap=plt.cm.viridis, interpolation='nearest',
-                  extent=extent)
+
+#Generating chessboard#
+Z = np.array(([0,1.0],[0.3,0.4])) 
+
+im = plt.imshow(Z, cmap=plt.cm.viridis, interpolation='nearest',extent=extent)
+# Plot a colorbar with the image 
+# Specify arbitrary die thickness for each of the dice in the dice object list and plot them 
+
 plt.show()
