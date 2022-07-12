@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Jul  8 16:08:25 2022
-
 @author: et24233
 """
 
@@ -10,13 +9,14 @@ import numpy as np
 
 #Wafer Parameters#
 diameter = 4
-dieSizeX = 2
-dieSizeY = 2
+dieSizeX = 1
+dieSizeY = 1
+
+rSquared = (diameter/2)**2 
+d1 = []
 
 
 ###### Defining Center Points ######
-
-
 #Creating arrays for the die centers x and y#    
 dieCenterPosX = (np.arange((dieSizeX/2), (diameter/2), (dieSizeX))) 
 dieCenterNegX = dieCenterPosX*-1 
@@ -28,18 +28,16 @@ dieCenterNegY = dieCenterPosY*-1
 dieCenterY = np.concatenate((dieCenterNegY, dieCenterPosY), axis=0)
 dieCenterY.sort()
 
-#Creating a class to define center points#
+#Creating a class to define center points and vertices#
 class Dice:
     def __init__(self, center, V1,V2,V3,V4):
         self.center = center
         self.V1 = V1
         self.V2 = V2
         self.V3 = V3
-        self.V4 = V4
+        self.V4 = V4      
         
-        
-#Printing coordinates of center points of dice using for loops# 
-d1 = []       
+#Printing coordinates of center points and vertices of dice using "for" loop#       
 for i in range(0,len(dieCenterX)):
     for j in range(0,len(dieCenterY)):
         dieCenter = np.array(([dieCenterX[i], dieCenterY[j]]))
@@ -59,37 +57,42 @@ for i in range(0,len(dieCenterX)):
         v4X = dieCenterX[i]+(dieSizeX/2)
         v4Y = dieCenterY[j]-(dieSizeY/2)
         v4 = np.array(([v4X, v4Y]))
+
+        print("Die Center:", dieCenter)
+        print("V1:", v1)
+        print("v2:", v2)
+        print("v3:", v3)
+        print("V4:", v4)
+        print("\n")
         
-        print("Die Center:")
-        print(dieCenter)
-        print("V1: ")
-        print(v1)
-        print("v2:")
-        print(v2)
-        print("v3:")
-        print(v3)
-        print("V4:")
-        print(v4)
+        v1Squared = np.square(v1)
+        v2Squared = np.square(v2)
+        v3Squared = np.square(v3)
+        v4Squared = np.square(v4)
+        SumV1Squared = sum(v1Squared)
+        SumV2Squared = sum(v2Squared)
+        SumV3Squared = sum(v3Squared)
+        SumV4Squared = sum(v4Squared)
         
+        if SumV1Squared <= rSquared and SumV2Squared <= rSquared and SumV3Squared <= rSquared and SumV4Squared <= rSquared : 
+             print("This die is in the wafer boundary")
+
         
         print("\n")
         
-        # if V1,V2,V3,V4 are within the wafer radius then append
-        #d1.append(Dice(dieCenter, v1, v2, v3, v4))     
+# if V1,V2,V3,V4 are within the wafer radius then append
+#d1.append(Dice(dieCenter, v1, v2, v3, v4))    
+        
+
         
 """       
 ###### Generating the Plot ######
 x = np.arange(-diameter, diameter, dieSizeX/2)
 y = np.arange(-diameter, diameter, dieSizeY/2)
 X, Y = np.meshgrid(x, y)
-
 extent = np.min(x), np.max(x), np.min(y), np.max(y)
 fig = plt.figure(frameon=False)
-
 Z = np.array(([0,0.5],[0.3,0.1])) 
 im1 = plt.imshow(Z, cmap=plt.cm.viridis, interpolation='nearest',
                   extent=extent)
-
-
-
 plt.show()"""
