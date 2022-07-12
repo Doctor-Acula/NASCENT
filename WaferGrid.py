@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Jul  8 16:08:25 2022
+
 @author: et24233
 """
 
@@ -76,23 +77,18 @@ for i in range(0,len(dieCenterX)):
         
         if SumV1Squared <= rSquared and SumV2Squared <= rSquared and SumV3Squared <= rSquared and SumV4Squared <= rSquared : 
              print("This die is in the wafer boundary")
-
+             d1.append(Dice(dieCenter, v1, v2, v3, v4)) 
+             
         
         print("\n")
-        
-# if V1,V2,V3,V4 are within the wafer radius then append
-#d1.append(Dice(dieCenter, v1, v2, v3, v4))    
-        
-
-        
-"""       
+               
 ###### Generating the Plot ######
 x = np.arange(-diameter, diameter, dieSizeX/2)
 y = np.arange(-diameter, diameter, dieSizeY/2)
 X, Y = np.meshgrid(x, y)
 extent = np.min(x), np.max(x), np.min(y), np.max(y)
 fig = plt.figure(frameon=False)
-Z = np.array(([0,0.5],[0.3,0.1])) 
+Z = np.array(([0,0.5],[0.3,0.1])) #Colors
 im1 = plt.imshow(Z, cmap=plt.cm.viridis, interpolation='nearest',
                   extent=extent)
-plt.show()"""
+plt.show()
