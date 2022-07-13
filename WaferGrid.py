@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Jul  8 16:08:25 2022
-
 @author: et24233
 """
 
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 
 #Wafer Parameters#
-diameter = 4
+diameter = 8
 dieSizeX = 1
 dieSizeY = 1
+dieMaxThickness = 700 # Die max thickness in Microns 
+ttvPitch = 0.25
 
 rSquared = (diameter/2)**2 
 d1 = []
@@ -31,14 +33,16 @@ dieCenterY.sort()
 
 #Creating a class to define center points and vertices#
 class Dice:
-    def __init__(self, center, V1,V2,V3,V4):
+    def __init__(self, center, V1,V2,V3,V4, thickness):
         self.center = center
         self.V1 = V1
         self.V2 = V2
         self.V3 = V3
-        self.V4 = V4      
+        self.V4 = V4
+        self.thickness = thickness
         
-#Printing coordinates of center points and vertices of dice using "for" loop#       
+#Printing coordinates of center points and vertices of dice using "for" loop#  
+thicknessList = []        
 for i in range(0,len(dieCenterX)):
     for j in range(0,len(dieCenterY)):
         dieCenter = np.array(([dieCenterX[i], dieCenterY[j]]))
@@ -61,8 +65,8 @@ for i in range(0,len(dieCenterX)):
 
         print("Die Center:", dieCenter)
         print("V1:", v1)
-        print("v2:", v2)
-        print("v3:", v3)
+        print("V2:", v2)
+        print("V3:", v3)
         print("V4:", v4)
         print("\n")
         
@@ -75,36 +79,35 @@ for i in range(0,len(dieCenterX)):
         SumV3Squared = sum(v3Squared)
         SumV4Squared = sum(v4Squared)
         
-        if SumV1Squared <= rSquared and SumV2Squared <= rSquared and SumV3Squared <= rSquared and SumV4Squared <= rSquared : 
+        if SumV1Squared <= rSquared and SumV2Squared <= rSquared and SumV3Squared <= rSquared and SumV4Squared <= rSquared :
              print("This die is in the wafer boundary")
-             d1.append(Dice(dieCenter, v1, v2, v3, v4)) 
-             
+             thickness = dieMaxThickness*(0.5 + 0.25*(np.sin(2*np.pi*(dieCenterX[i])/ttvPitch)) + 0.25*(np.sin(2*np.pi*(dieCenterY[j])/ttvPitch)))
+             d1.append(Dice(dieCenter, v1, v2, v3, v4,thickness))
+             print('thickness', thickness)
+             thicknessList.append(thickness) 
         
-        print("\n")
-               
+        print("\n")    
+       
 ###### Generating the Plot ######
-"""x = np.arange(-diameter/2, diameter/2, 0.05) 
-y = np.arange(-diameter/2, diameter/2, 0.05)
-X, Y = np.meshgrid(x, y)"""
- 
-x = np.zeros(len(d1))
-y = np.zeros(len(d1))
 
-for i in range (0, len(d1)):
-    x[i] = d1[i].center[0]
-    y[i] = d1[i].center[1]
-    
-x = np.array(([-0.5,-0.5,0.5,0.5]))
-y = np.array(([-0.5,0.5,-0.5,0.5]))
-X, Y = np.meshgrid(x, y)
-extent = np.min(x)-dieSizeX/2, np.max(x)+dieSizeX/2, np.min(y)-dieSizeY/2, np.max(y)+dieSizeY/2 
-fig = plt.figure(frameon=False)
+k = 0
+dieThicknessPlot = np.zeros(([len(dieCenterX),len(dieCenterY)]))
+for i in range(0,len(dieCenterX)):
+    for j in range (0,len(dieCenterY)): 
+        if (np.sqrt((dieCenterX[i]+dieSizeX/2)**2 + (dieCenterY[j]+dieSizeY/2)**2) < (diameter/2) and 
+            np.sqrt((dieCenterX[i]-dieSizeX/2)**2 + (dieCenterY[j]+dieSizeY/2)**2) < (diameter/2) and 
+            np.sqrt((dieCenterX[i]+dieSizeX/2)**2 + (dieCenterY[j]-dieSizeY/2)**2) < (diameter/2) and
+            np.sqrt((dieCenterX[i]-dieSizeX/2)**2 + (dieCenterY[j]-dieSizeY/2)**2) < (diameter/2)):
+                dieThicknessPlot[i][j] = d1[k].thickness - min(thicknessList) #
+                k += 1 
 
-#Generating chessboard#
-Z = np.array(([0,1.0],[0.3,0.4])) 
+extent = np.min(dieCenterX)-dieSizeX/2, np.max(dieCenterX)+dieSizeX/2, np.min(dieCenterY)-dieSizeY/2, np.max(dieCenterY)+dieSizeY/2
+im = plt.imshow(dieThicknessPlot, cmap=plt.cm.viridis, interpolation='nearest',extent=extent)
 
-im = plt.imshow(Z, cmap=plt.cm.viridis, interpolation='nearest',extent=extent)
-# Plot a colorbar with the image 
-# Specify arbitrary die thickness for each of the dice in the dice object list and plot them 
+ax = plt.subplot()
+divider = make_axes_locatable(ax)
+cax = divider.append_axes("right", size="5%", pad=0.05)
+
+plt.colorbar(im, cax=cax)
 
 plt.show()
