@@ -41,7 +41,7 @@ class Dice:
         self.V4 = V4
         self.thickness = thickness
         
-#Printing coordinates of center points and vertices of dice using "for" loop#  
+#Defining coordinates of center points and vertices of dice using "for" loop#  
 thicknessList = []        
 for i in range(0,len(dieCenterX)):
     for j in range(0,len(dieCenterY)):
@@ -106,7 +106,7 @@ plt.colorbar(im, cax=cax)
 plt.show()
 
 
-
+########################################
 ###### Defining LED Center Points ######  
 LEDCenterPosX = (np.arange((dieSizeX/2), (diameter/2), (dieSizeX))) 
 LEDCenterNegX = dieCenterPosX*-1 
