@@ -130,8 +130,8 @@ class LEDs:
         self.intensity = intensity
 
 #Printing coordinates of center points and vertices of LEDs using "for" loops#         
-for i in range(0, (int(LEDGridX/20)-1)): 
-    for j in range(0, (int(LEDGridX/20)-1)):
+for i in range(0, (int(LEDGridX/pitch)-1)): 
+    for j in range(0, (int(LEDGridX/pitch)-1)):
         LEDCenterPosX = np.arange(0, 50, pitch) 
         no0x = np.delete(LEDCenterPosX, 0) #This variable was created to bypass duplicate values of 0
         LEDCenterNegX = no0x*-1 
