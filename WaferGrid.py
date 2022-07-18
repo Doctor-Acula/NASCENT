@@ -15,6 +15,8 @@ dieSizeX = 10
 dieSizeY = 10
 dieMaxThickness = 700 # Die max thickness in Microns 
 ttvPitch = 0.25
+#pitchLEDX = 10
+#pitchLEDY = 10 
 
 rSquared = (diameter/2)**2 
 d1 = []
@@ -98,32 +100,24 @@ extent = np.min(dieCenterX)-dieSizeX/2, np.max(dieCenterX)+dieSizeX/2, np.min(di
 im = plt.imshow(dieThicknessPlot, cmap=plt.cm.viridis, interpolation='nearest',extent=extent)
 
 ax = plt.subplot()
-plt.title("Thicknesses of WHOLE Wafer Dice (m)")
+plt.title("Thicknesses of WHOLE Wafer Dice")
 divider = make_axes_locatable(ax)
 cax = divider.append_axes("right", size="5%", pad=0.45)
 
 plt.colorbar(im, cax=cax)
+plt.title("   (m)", loc= 'left')
 
 plt.show()
 
 
-########################################
+############################
 ##### LED Parameters ######
-LEDx = 4.4
+LEDx = 4.4 #Dimensions of LEDs themselves
 LEDy = 4.4
+LEDGridX = 100 #Dimensions of LED grid
+LEDGridY = 100
 power = 1.1
-area = dieSizeX*dieSizeY
-
-###### Defining LED Center Points ######  
-LEDCenterPosX = (np.arange((dieSizeX/2), (diameter/2), (dieSizeX))) 
-LEDCenterNegX = dieCenterPosX*-1 
-LEDCenterX = np.concatenate((dieCenterNegX, dieCenterPosX), axis=0)
-LEDCenterX.sort()
-
-LEDCenterPosY =  (np.arange((dieSizeY/2), (diameter/2), (dieSizeY)))
-LEDCenterNegY = dieCenterPosY*-1
-LEDCenterY = np.concatenate((dieCenterNegY, dieCenterPosY), axis=0)
-LEDCenterY.sort()
+pitch = 20
 
 #Creating a class to define a grid of LEDs#
 class LEDs:
@@ -136,9 +130,23 @@ class LEDs:
         self.intensity = intensity
 
 #Printing coordinates of center points and vertices of LEDs using "for" loops#         
-for i in range(0,len(dieCenterX)):
-    for j in range(0,len(dieCenterY)):
+for i in range(0, (int(LEDGridX/20)-1)): 
+    for j in range(0, (int(LEDGridX/20)-1)):
+        LEDCenterPosX = np.arange(0, 50, pitch) 
+        no0x = np.delete(LEDCenterPosX, 0) #This variable was created to bypass duplicate values of 0
+        LEDCenterNegX = no0x*-1 
+        LEDCenterX = np.concatenate((LEDCenterNegX, LEDCenterPosX), axis=0)
+        LEDCenterX.sort()
+
+        LEDCenterPosY =  np.arange(0, 50, pitch)
+        no0y = np.delete(LEDCenterPosX, 0) #This variable was created to bypass duplicate values of 0
+        LEDCenterNegY = no0y*-1
+        LEDCenterY = np.concatenate((LEDCenterNegY, LEDCenterPosY), axis=0)
+        LEDCenterY.sort() 
+        
         LEDCenter = np.array(([LEDCenterX[i], LEDCenterY[j]]))
+        
+        ########################
         
         Lv1X = LEDCenterX[i]+(LEDx/2)
         Lv1Y = LEDCenterY[j]+(LEDy/2)
@@ -154,16 +162,13 @@ for i in range(0,len(dieCenterX)):
         
         Lv4X = LEDCenterX[i]+(LEDx/2)
         Lv4Y = LEDCenterY[j]-(LEDy/2)
-        Lv4 = np.array(([Lv4X, Lv4Y]))
-        
-        intensity = power/area
+        Lv4 = np.array(([Lv4X, Lv4Y]))       
         
         print("LED Center:", LEDCenter)
         print("V1:", Lv1)
         print("V2:", Lv2)
         print("V3:", Lv3)
         print("V4:", Lv4)
-        print("LED Intensity:", round(intensity, 3)) #Watts/m^2
         print("\n")
         
         Lv1Squared = np.square(Lv1)
@@ -175,8 +180,8 @@ for i in range(0,len(dieCenterX)):
         SumLV3Squared = sum(Lv3Squared)
         SumLV4Squared = sum(Lv4Squared)
         
-        if SumLV1Squared <= rSquared and SumLV2Squared <= rSquared and SumLV3Squared <= rSquared and SumLV4Squared <= rSquared :
-             print("This LED is in the wafer boundary")
+        #if SumLV1Squared <= rSquared and SumLV2Squared <= rSquared and SumLV3Squared <= rSquared and SumLV4Squared <= rSquared :
+             #print("This LED is in the wafer boundary")
  
         
-        print("\n")    
+        print("\n")  
