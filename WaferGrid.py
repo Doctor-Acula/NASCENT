@@ -11,15 +11,13 @@ import numpy as np
 
 #Wafer Parameters#
 diameter = 100
-dieSizeX = 10
-dieSizeY = 10
+dieSizeX = 20
+dieSizeY = 20
 dieMaxThickness = 700 # Die max thickness in Microns 
 ttvPitch = 0.25
-#pitchLEDX = 10
-#pitchLEDY = 10 
 
 rSquared = (diameter/2)**2 
-d1 = []
+dieList = []
 
 
 ###### Defining Center Points ######
@@ -77,14 +75,10 @@ for i in range(0,len(dieCenterX)):
         
         if SumV1Squared <= rSquared and SumV2Squared <= rSquared and SumV3Squared <= rSquared and SumV4Squared <= rSquared :
              thickness = dieMaxThickness*(0.5 + 0.25*(np.sin(2*np.pi*(dieCenterX[i])/ttvPitch)) + 0.25*(np.sin(2*np.pi*(dieCenterY[j])/ttvPitch)))
-             d1.append(Dice(dieCenter, v1, v2, v3, v4,thickness))
-             #print('thickness', thickness)
-             thicknessList.append(thickness) 
-        
-        #print("\n")    
+             dieList.append(Dice(dieCenter, v1, v2, v3, v4,thickness))
+             thicknessList.append(thickness)     
        
 ###### Generating the Plot ######
-
 k = 0
 dieThicknessPlot = np.zeros(([len(dieCenterX),len(dieCenterY)]))
 for i in range(0,len(dieCenterX)):
@@ -93,7 +87,7 @@ for i in range(0,len(dieCenterX)):
             np.sqrt((dieCenterX[i]-dieSizeX/2)**2 + (dieCenterY[j]+dieSizeY/2)**2) < (diameter/2) and 
             np.sqrt((dieCenterX[i]+dieSizeX/2)**2 + (dieCenterY[j]-dieSizeY/2)**2) < (diameter/2) and
             np.sqrt((dieCenterX[i]-dieSizeX/2)**2 + (dieCenterY[j]-dieSizeY/2)**2) < (diameter/2)):
-                dieThicknessPlot[i][j] = d1[k].thickness - min(thicknessList) #
+                dieThicknessPlot[i][j] = dieList[k].thickness - min(thicknessList) #
                 k += 1 
 
 extent = np.min(dieCenterX)-dieSizeX/2, np.max(dieCenterX)+dieSizeX/2, np.min(dieCenterY)-dieSizeY/2, np.max(dieCenterY)+dieSizeY/2
@@ -118,31 +112,43 @@ LEDGridX = 100 #Dimensions of LED grid
 LEDGridY = 100
 power = 1.1
 pitch = 20
+LEDList = []
 
 #Creating a class to define a grid of LEDs#
 class LEDs:
-    def __init__(self, center, V1,V2,V3,V4, intensity):
+    def __init__(self, center, V1,V2,V3,V4, intensity, kV1, kV2, kV3, kV4):
         self.center = center
         self.V1 = V1
         self.V2 = V2
         self.V3 = V3
         self.V4 = V4
         self.intensity = intensity
+        self.kV1 = kV1
+        self.kV2 = kV2
+        self.kV3 = kV3
+        self.kV4 = kV4
 
-#Printing coordinates of center points and vertices of LEDs using "for" loops#         
+#Printing coordinates of center points and vertices of LEDs using "for" loops#  
+intensity = power/(LEDx*LEDy)
+
+LEDCenterPosX = np.arange(pitch/2, diameter/2, pitch) 
+LEDCenterNegX = LEDCenterPosX*-1 
+LEDCenterX = np.concatenate((LEDCenterNegX, LEDCenterPosX), axis=0)
+LEDCenterX.sort()
+
+LEDCenterPosY =  np.arange(pitch/2, diameter/2, pitch)
+LEDCenterNegY = LEDCenterPosY*-1
+LEDCenterY = np.concatenate((LEDCenterNegY, LEDCenterPosY), axis=0)
+LEDCenterY.sort() 
+
+### Kernel Parameters ###
+klengthX = (2*np.max(dieCenterX)+dieSizeX)/len(LEDCenterX) 
+klengthY = (2*np.max(dieCenterY)+dieSizeY)/len(LEDCenterY) 
+
+       
 for i in range(0, (int(LEDGridX/pitch)-1)): 
     for j in range(0, (int(LEDGridX/pitch)-1)):
-        LEDCenterPosX = np.arange(0, 50, pitch) 
-        no0x = np.delete(LEDCenterPosX, 0) #This variable was created to bypass duplicate values of 0
-        LEDCenterNegX = no0x*-1 
-        LEDCenterX = np.concatenate((LEDCenterNegX, LEDCenterPosX), axis=0)
-        LEDCenterX.sort()
-
-        LEDCenterPosY =  np.arange(0, 50, pitch)
-        no0y = np.delete(LEDCenterPosX, 0) #This variable was created to bypass duplicate values of 0
-        LEDCenterNegY = no0y*-1
-        LEDCenterY = np.concatenate((LEDCenterNegY, LEDCenterPosY), axis=0)
-        LEDCenterY.sort() 
+        
         
         LEDCenter = np.array(([LEDCenterX[i], LEDCenterY[j]]))
         
@@ -164,12 +170,6 @@ for i in range(0, (int(LEDGridX/pitch)-1)):
         Lv4Y = LEDCenterY[j]-(LEDy/2)
         Lv4 = np.array(([Lv4X, Lv4Y]))       
         
-        print("LED Center:", LEDCenter)
-        print("V1:", Lv1)
-        print("V2:", Lv2)
-        print("V3:", Lv3)
-        print("V4:", Lv4)
-        print("\n")
         
         Lv1Squared = np.square(Lv1)
         Lv2Squared = np.square(Lv2)
@@ -180,8 +180,60 @@ for i in range(0, (int(LEDGridX/pitch)-1)):
         SumLV3Squared = sum(Lv3Squared)
         SumLV4Squared = sum(Lv4Squared)
         
-        #if SumLV1Squared <= rSquared and SumLV2Squared <= rSquared and SumLV3Squared <= rSquared and SumLV4Squared <= rSquared :
-             #print("This LED is in the wafer boundary")
- 
+        Kv1X = LEDCenterX[i]+(klengthX/2)
+        Kv1Y = LEDCenterY[j]+(klengthY/2)
+        Kv1 = np.array(([Kv1X, Kv1Y]))
         
-        print("\n")  
+        Kv2X = LEDCenterX[i]-(klengthX/2)
+        Kv2Y = LEDCenterY[j]+(klengthY/2)
+        Kv2 = np.array(([Kv2X, Kv2Y]))
+        
+        Kv3X = LEDCenterX[i]-(klengthX/2)
+        Kv3Y = LEDCenterY[j]-(klengthY/2)
+        Kv3 = np.array(([Kv3X, Kv3Y]))
+        
+        Kv4X = LEDCenterX[i]+(klengthX/2)
+        Kv4Y = LEDCenterY[j]-(klengthY/2)
+        Kv4 = np.array(([Kv4X, Kv4Y]))    
+        
+        print("Kernel Center:", LEDCenter)
+        print("V1:", Kv1)
+        print("V2:", Kv2)
+        print("V3:", Kv3)
+        print("V4:", Kv4)
+        print("\n")
+    
+        
+        if SumLV1Squared <= rSquared and SumLV2Squared <= rSquared and SumLV3Squared <= rSquared and SumLV4Squared <= rSquared :
+             LEDList.append(LEDs(LEDCenter, Lv1, Lv2, Lv3, Lv4, intensity, Kv1, Kv2, Kv3, Kv4))
+
+### Determining if dice areas and kernel areas overlap ###
+
+pDiceLED = np.zeros((len(dieList), len(LEDList))) #a zero matrix of size number of dice * number of LED's 
+for i in range(0, len(dieList)): #for i in range (0, length of die list):
+    for j in range(0, len(LEDList)): #for j in range (0, length of led list):
+        R1 = [dieList[i].V3[0], dieList[i].V3[1], dieList[i].V1[0], dieList[i].V1[1]]
+        R2 = [LEDList[j].kV3[0], LEDList[j].kV3[1], LEDList[j].kV1[0], LEDList[j].kV1[1]]
+        
+        if (R1[0]>=R2[2]) or (R1[2]<=R2[0]) or (R1[3]<=R2[1]) or (R1[1]>=R2[3]):
+            pDiceLED[i][j] = 0
+        else:
+            av1x = np.min((dieList[i].V1[0],LEDList[j].kV1[0]))
+            av1y = np.min((dieList[i].V1[1],LEDList[j].kV1[1]))
+            av3x = np.min((dieList[i].V3[0],LEDList[j].kV3[0]))
+            av3y = np.min((dieList[i].V3[1],LEDList[j].kV3[1]))
+                
+            overlapArea = (abs(av1y-av3y))*(abs(av1x-av3x))
+            
+            print('Die id in overlap: ',i)
+            print('die center: ',dieList[i].center)
+            print('Die V1: ', dieList[i].V1)
+            print('Die V3:', dieList[i].V3)
+            print('LED id in overlap: ',j)
+            print('LED Center: ', LEDList[j].center)
+            print('LED-V1:',LEDList[j].kV1)
+            print('LED-V3:',LEDList[j].kV3)
+            print()
+        
+            pDiceLED[i,j] = (overlapArea/(klengthX*klengthY))  #The overlap area between the ith die and jth LED 
+  
